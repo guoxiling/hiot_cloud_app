@@ -60,7 +60,7 @@ public class TestMVPActivity extends BaseActivity<TestView,TestPresenter> implem
 //        }
 //
 //    }
-    public PresenterComponent getActivityComponent(){
-        return DaggerPresenterComponent.builder().build();
-    }
+//    public PresenterComponent getActivityComponent(){
+//        return DaggerPresenterComponent.builder().build();
+//    }
 }
