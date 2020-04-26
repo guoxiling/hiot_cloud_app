@@ -1,4 +1,4 @@
-package com.huatec.hiot_cloud.base;
+package com.huatec.hiot_cloud.ui.base;
 
 import android.app.Application;
 import android.os.Bundle;
@@ -26,7 +26,9 @@ public abstract class BaseActivity <V extends BaseView,P extends BasePresenter<V
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         presenter = createPresenter();
-        presenter.setView((V) this);
+        if(presenter != null) {
+            presenter.setView((V) this);
+        }
     }
     //定义抽象方法createPresenter
     public abstract P createPresenter();
