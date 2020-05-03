@@ -50,6 +50,32 @@ public class TestOkHttpActivity extends AppCompatActivity {
                 testEnqueue();
             }
         });
+        //登录测试
+        Button btnLogin = findViewById(R.id.btn_okhttp_login);
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                login("guoxiling","abc123","app");
+            }
+        });
+
+        //获取用户信息
+        Button btnUserinfo = findViewById(R.id.btn_okhttp_userinfo);
+        btnUserinfo.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                getUserInfo("");
+            }
+        });
+
+        //修改邮箱
+        Button btnUpdateEmail = findViewById(R.id.btn_okhttp_update_email);
+        btnUpdateEmail.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                updateEmail("authorization","email");
+            }
+        });
     }
 
 
@@ -80,33 +106,6 @@ public class TestOkHttpActivity extends AppCompatActivity {
         OkHttpClient okHttpClient = new OkHttpClient();
         Request request = new Request.Builder().url(baseUrl).build();
         callRequeue(okHttpClient, request);
-
-        //登录测试
-        Button btnLogin = findViewById(R.id.btn_okhttp_login);
-        btnLogin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                login("guoxiling","abc123","app");
-            }
-        });
-
-        //获取用户信息
-        Button btnUserinfo = findViewById(R.id.btn_okhttp_userinfo);
-        btnUserinfo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                getUserInfo("");
-            }
-        });
-
-        //修改邮箱
-        Button btnUpdateEmail = findViewById(R.id.btn_okhttp_update_email);
-        btnUpdateEmail.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                updateEmail("authorization","email");
-            }
-        });
     }
 
     private void callRequeue(OkHttpClient okHttpClient, Request request) {
@@ -135,7 +134,6 @@ public class TestOkHttpActivity extends AppCompatActivity {
         Request request = new Request.Builder().post(body).url(url).header("Authorization",authorization).build();
         callRequeue(okHttpClient, request);
     }
-
     /**
      * 获取用户信息
      * @param authorization
@@ -147,7 +145,6 @@ public class TestOkHttpActivity extends AppCompatActivity {
         Request request = new Request.Builder().get().url(url).header("Authorization",authorization).build();
         callRequeue(okHttpClient, request);
     }
-
     /**
      * 登录
      * @param userName
