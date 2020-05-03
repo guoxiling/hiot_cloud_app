@@ -64,7 +64,7 @@ public class TestOkHttpActivity extends AppCompatActivity {
         btnUserinfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getUserInfo("");
+                getUserInfo("e907ffd13e4441a7bd31cf51f6e494f3_217a9da2de0f4b8bbb431826e8c1448d_use");
             }
         });
 
@@ -73,7 +73,7 @@ public class TestOkHttpActivity extends AppCompatActivity {
         btnUpdateEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateEmail("authorization","email");
+                updateEmail("e907ffd13e4441a7bd31cf51f6e494f3_217a9da2de0f4b8bbb431826e8c1448d_use","guoxiling@qq.com");
             }
         });
     }
@@ -130,8 +130,8 @@ public class TestOkHttpActivity extends AppCompatActivity {
     private void updateEmail(String authorization, String email) {
         OkHttpClient okHttpClient = new OkHttpClient();
         FormBody body = new FormBody.Builder().build();
-        String url = baseUrl + "/user/email?email" + email;
-        Request request = new Request.Builder().post(body).url(url).header("Authorization",authorization).build();
+        String url = baseUrl + "/user/email?email=" + email;
+        Request request = new Request.Builder().put(body).url(url).header("Authorization",authorization).build();
         callRequeue(okHttpClient, request);
     }
     /**
