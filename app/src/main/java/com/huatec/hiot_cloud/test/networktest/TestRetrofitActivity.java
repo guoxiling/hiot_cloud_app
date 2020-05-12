@@ -3,14 +3,20 @@ package com.huatec.hiot_cloud.test.networktest;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.Toast;
 
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.huatec.hiot_cloud.R;
 import com.huatec.hiot_cloud.test.mvptest.model.User;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 import okhttp3.ResponseBody;
 import retrofit2.Call;
@@ -24,12 +30,16 @@ public class TestRetrofitActivity extends AppCompatActivity {
     private static final String TAG = "TestRetrofitActivity";
     private Retrofit retrofit;
     private TestRetrofitService service;
+    private Gson gson = new Gson();
+    private EditText etToken;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_test_restrofit);
 
+        //取到edit_token
+        etToken = findViewById(R.id.et_token_retrofit);
         //创建retrofit和service对象
         createRetrofit();
         //百度
@@ -53,15 +63,15 @@ public class TestRetrofitActivity extends AppCompatActivity {
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                login2("guoxiling","abc123","app");
+                login("guoxiling","abc123","app");
             }
         });
-        //查看用户信息
+        //获取用户信息
         Button btnUserinfo = findViewById(R.id.btn_retrofit_userinfo);
         btnUserinfo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getUserInfo("e907ffd13e4441a7bd31cf51f6e494f3_26de0f16def64788924a6ecc63b44d56_use");
+                getUserInfo("e907ffd13e4441a7bd31cf51f6e494f3_0fafe0440f03472f82af5e5933589084_use");
             }
         });
         //修改邮箱
@@ -69,7 +79,7 @@ public class TestRetrofitActivity extends AppCompatActivity {
         btnUpdateEmail.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                updateEmail("e907ffd13e4441a7bd31cf51f6e494f3_26de0f16def64788924a6ecc63b44d56_use","emailtest@qq.com");
+                updateEmail("e907ffd13e4441a7bd31cf51f6e494f3_0fafe0440f03472f82af5e5933589084_use","guoguoguo@qq.com");
             }
         });
     }
@@ -79,8 +89,8 @@ public class TestRetrofitActivity extends AppCompatActivity {
      */
     private void register() {
         UserBean userBean = new UserBean();
-        userBean.setUsername("guoguoguo");
-        userBean.setEmail("guoguoguo@qq.com");
+        userBean.setUsername("guoguoguo3");
+        userBean.setEmail("guoguoguo3@qq.com");
         userBean.setPassword("abc123");
         userBean.setUserType("1");
         Call<ResponseBody> call = service.register(userBean);
@@ -98,12 +108,30 @@ public class TestRetrofitActivity extends AppCompatActivity {
     }
 
     /**
-     * 查看用户信息
+     * 获取用户信息
      * @param authorization
      */
     private void getUserInfo(String authorization) {
-        Call<ResponseBody> call = service.getUserInfo(authorization);
-        callEnqueue(call);
+//        Call<ResponseBody> call = service.getUserInfo(authorization);
+//        callEnqueueUserInfo(call);
+        Call<ResultBase<UserBean>> call = service.getUserInfo2(authorization);
+        call.enqueue(new Callback<ResultBase<UserBean>>() {
+            @Override
+            public void onResponse(Call<ResultBase<UserBean>> call, Response<ResultBase<UserBean>> response) {
+                ResultBase<UserBean> resultBase = response.body();
+                if (resultBase != null && resultBase.getData() != null){
+                    resultBase.getData();
+                    String str = resultBase.getData().getUsername() + "," + resultBase.getData().getEmail();
+                    Toast.makeText(TestRetrofitActivity.this, str, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResultBase<UserBean>> call, Throwable t) {
+
+            }
+        });
     }
 
     private void callEnqueue(Call<ResponseBody> call) {
@@ -126,6 +154,66 @@ public class TestRetrofitActivity extends AppCompatActivity {
         });
     }
 
+    private void callEnqueueLogin(Call<ResponseBody> call) {
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+//                    Log.d(TAG, "onResponse: " + response.body().string());
+                        Type type = new TypeToken<ResultBase<LoginResultDTO>>() {}.getType();
+                try {
+//                    Log.d(TAG, "onResponse: " + response.body().string());
+                    ResultBase<LoginResultDTO> loginResult = gson.fromJson(response.body().string(), type);
+                    if (loginResult != null && loginResult.getData() != null){
+                        String token = loginResult.getData().getTokenValue();
+                        etToken.setText(token);
+                    }else if (loginResult != null && !TextUtils.isEmpty(loginResult.getMsg())){
+                        Toast.makeText(TestRetrofitActivity.this, loginResult.getMsg(), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage(), t);
+
+            }
+        });
+    }
+
+    private void callEnqueueUserInfo(Call<ResponseBody> call) {
+        call.enqueue(new Callback<ResponseBody>() {
+            @Override
+            public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
+                try {
+//                    Log.d(TAG, "onResponse: " + response.body().string());
+                    Type type = new TypeToken<ResultBase<UserBean>>(){}.getType();
+                    ResultBase<UserBean> resultBase = gson.fromJson(response.body().string(),type);
+                    if (resultBase != null && resultBase.getData() != null) {
+                        UserBean userBean = resultBase.getData();
+                        String str = String.format("用户名：%s，密码：%s，email：%s，用户类型：%s",
+                                userBean.getUsername(), userBean.getPassword(), userBean.getEmail(), userBean.getUserType());
+                        Toast.makeText(TestRetrofitActivity.this, str, Toast.LENGTH_SHORT).show();
+                    }
+                    if (resultBase != null && resultBase.getMsg() != null){
+                        Toast.makeText(TestRetrofitActivity.this, resultBase.getMsg(), Toast.LENGTH_SHORT).show();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Log.e(TAG, "onResponse: " + e.getMessage(), e);
+                }
+            }
+
+            @Override
+            public void onFailure(Call<ResponseBody> call, Throwable t) {
+                Log.e(TAG, "onFailure: " + t.getMessage(), t);
+
+            }
+        });
+    }
+
     /**
      * 登录
      * @param userName
@@ -134,7 +222,7 @@ public class TestRetrofitActivity extends AppCompatActivity {
      */
     private void login(String userName, String password, String loginCode) {
         Call<ResponseBody> call = service.login(userName, password, loginCode);
-        callEnqueue(call);
+        callEnqueueLogin(call);
     }
 
     /**
